@@ -1,5 +1,7 @@
 const settings = require("./settings.json")
 const WebSocket = require('ws');
+const spotifyhelper = require('spotify-web-helper')
+const spotify = spotifyhelper();
 const bash = require('child_process')
 const auth = Buffer.from(settings.username + ':' + settings.password).toString('base64'); // Colon needs to be present
 const ws = new WebSocket('ws://union.serux.pro:2082', {
@@ -19,6 +21,10 @@ ws.on('close', (code, reason) => {
 ws.on('error', (err) => {
     console.log(err);
 });
+
+
+spotify.player.on('error', err => console.error(err));
+spotify.player.on('ready', () => console.log('ready'));
 
 const prefix = settings.prefix;
 
@@ -48,6 +54,12 @@ ws.on('message', (msg) => {
 	}
         send(server, `Hello, William!`);
     }
+    if (command === 'ping') {
+        if (sender !== user) {
+            return;
+        }
+        send(server, `Go fuck yourself.`)
+    }
 
     if (command === 'time') {
 	if (sender !== user) {
@@ -61,6 +73,40 @@ ws.on('message', (msg) => {
 		return;
 	}
         send(server, args);
+    }
+
+    if (command === 'np') {
+        if (sender !== user) {
+            return;
+        }
+        if (!spotify.status) {
+            return send(server, 'Not connected to Spotify.');
+        }
+        const track = spotify.status.track;
+        const s = `${track.track_resource.name} by ${track.artist_resource.name}`;
+        send(server, s);
+    }
+
+    if (command === 'play') {
+        if (sender !== user) {
+            return;
+        }
+        if (!spotify.status) {
+            return send(server, 'Not connected to Spotify.');
+        }
+        spotify.player.play(args)
+        send(server, 'Playing track.');
+    }
+
+    if (command === 'pause') {
+        if (sender !== user) {
+            return;
+        }
+        if (!spotify.status) {
+            return send(server, 'Not connected to Spotify.');
+        }
+        spotify.player.pause();
+        send(server, 'Pausing...');
     }
 
     if (command === 'help') {
