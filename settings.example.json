@@ -1,5 +1,5 @@
 {
-    "login": "username:password",
-    "prefix": "prefix",
-    "user": "your username"
+    "username": "username",
+    "password": "password",
+    "prefix": "prefix"
 }

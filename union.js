@@ -1,7 +1,7 @@
 const settings = require("./settings.json")
 const WebSocket = require('ws');
 const bash = require('child_process')
-const auth = Buffer.from(settings.login).toString('base64'); // Colon needs to be present
+const auth = Buffer.from(settings.username + ':' + settings.password).toString('base64'); // Colon needs to be present
 const ws = new WebSocket('ws://union.serux.pro:2082', {
     headers: {
         'Authorization': `Basic ${auth}`
@@ -36,7 +36,7 @@ ws.on('message', (msg) => {
     }
 
     const sender = json.d.author;
-    const user = settings.user;
+    const user = settings.username;
     const server = json.d.server;
     const command = content.substring(1).split(' ')[0].toLowerCase();
     const args = content.split(' ').slice(1).join(' ');
